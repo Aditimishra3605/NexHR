@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # NexHR — An Integrated Employee Management, Performance & Payroll Analytics Platform
 
 A B.Tech CSE (DSDA) 7th-semester major project. NexHR is a Streamlit-based
@@ -133,3 +134,7 @@ A few deliberate decisions worth mentioning in your project report / viva:
 
 ---
 Built as a major project for B.Tech CSE (DSDA), 7th Semester.
+=======
+# NexHR
+Workforce Intelligence Platform
+>>>>>>> 088a908030d000cd5db8fa12280b00faea6486c8

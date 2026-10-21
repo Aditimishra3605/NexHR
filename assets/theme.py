@@ -1,9 +1,4 @@
-"""
-NexHR - Shared Design System
-Single source of truth for colors, typography, reusable UI components
-(page headers, cards, status badges, icons) and Plotly chart styling.
-Every page imports from here so the whole app looks like one product.
-"""
+
 import streamlit as st
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,5 @@
 
 import plotly.express as px
-
 from services import performance_service, employee_service
 from assets.theme import rose_palette, style_fig, PRIMARY, PRIMARY_DARK, SECONDARY, ACCENT
 

@@ -1,7 +1,6 @@
 
 import plotly.express as px
 import pandas as pd
-
 from services import salary_service
 from assets.theme import rose_palette, style_fig, MAIN_TEXT
 

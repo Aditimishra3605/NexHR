@@ -1,8 +1,4 @@
-"""
-NexHR - Demo Data Seeder
-Populates the database with realistic fake data using Faker, so the app
-is fully explorable out-of-the-box. Run: python -m data.seed_data
-Safe to re-run -- it wipes and recreates all tables first.
+"""Run: python -m data.seed_data
 """
 import os
 import random

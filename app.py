@@ -80,3 +80,13 @@ elif selected == "Workforce Planning":
 elif selected == "AI Assistant":
     from pages import ai_assistant
     ai_assistant.render()
+
+
+
+from data.seed_data import (
+    seed,
+)
+try:
+  seed()  # Yeh function aapke database tables mein sample data insert kar dega
+except Exception as e:
+  print("Database already seeded or error:", e)
