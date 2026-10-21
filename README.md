@@ -1,0 +1,2 @@
+# NexHR
+Workforce Intelligence Platform
