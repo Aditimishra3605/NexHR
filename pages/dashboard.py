@@ -57,15 +57,19 @@ def render():
 
     with left:
         section_title("Top Performer Employees", "award")
-        top_df = performance_service.get_top_performers(5)
+        
+        # Session state mein top_df store kar lete hain taaki select karne par data shuffle na ho
+        if "cached_top_performers" not in st.session_state:
+            st.session_state["cached_top_performers"] = performance_service.get_top_performers(5)
+            
+        top_df = st.session_state["cached_top_performers"]
+
         if top_df.empty:
             st.info("No performance data yet.")
         else:
-            # Drop _id safely for display if needed, but keep a copy for mapping
             display_df = top_df.drop(columns=["_id"], errors="ignore")
             st.dataframe(display_df, use_container_width=True, hide_index=True)
             
-            # Unique key ke sath selectbox
             selected_name = st.selectbox(
                 "View full details of:",
                 options=top_df["Name"].tolist(),
