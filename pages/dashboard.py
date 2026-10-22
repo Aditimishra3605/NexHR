@@ -31,16 +31,14 @@ def render():
         due_amount = sum(e.salary_record.total_payout for e in q.get_all_employees(db)
                           if e.salary_record and e.salary_record.salary_status.value == "Due")
 
-# --- KPI Cards ---
-    # Pehle row mein 3 KPIs
+    # --- KPI Cards ---
     c1, c2, c3 = st.columns(3)
     c1.metric("Total Employees", total_employees)
     c2.metric("Active Employees", active_employees)
     c3.metric("Monthly Payroll", f"₹{payroll_info['monthly_payroll']:,.0f}")
 
-    st.write("") # Thodi spacing ke liye
+    st.write("") 
     
-    # Dusre row mein bache hue 2 KPIs
     c4, c5 = st.columns(2)
     c4.metric("Total Salary Due", f"₹{due_amount:,.0f}", delta=f"{due_count} employees", delta_color="inverse")
     c5.metric("Daily Workforce Cost", f"₹{payroll_info['daily_cost']:,.0f}")
@@ -54,8 +52,7 @@ def render():
 
     st.markdown("---")
 
-
-# --- Top Performers + Project Overview ---
+    # --- Top Performers + Project Overview ---
     left, right = st.columns([1.1, 1])
 
     with left:
@@ -64,32 +61,18 @@ def render():
         if top_df.empty:
             st.info("No performance data yet.")
         else:
-            display_df = top_df.drop(columns=["_id"])
-            st.dataframe(display_df, width='stretch', hide_index=True)
+            # Drop _id safely for display if needed, but keep a copy for mapping
+            display_df = top_df.drop(columns=["_id"], errors="ignore")
+            st.dataframe(display_df, use_container_width=True, hide_index=True)
             
-            # Updated Search bar
+            # Unique key ke sath selectbox
             selected_name = st.selectbox(
                 "View full details of:",
-                top_df["Name"].tolist(),
+                options=top_df["Name"].tolist(),
                 index=None,
                 placeholder="Search an employee...",
-                key="dash_top_performer_select"
+                key="dash_top_performer_select_unique"
             )
-            
-            if selected_name:
-                emp_id = int(top_df[top_df["Name"] == selected_name]["_id"].iloc[0])
-                details = employee_service.get_employee_details(emp_id)
-                with st.expander(f"{details['name']} — {details['role']}", expanded=True):
-                    dcol1, dcol2, dcol3 = st.columns(3)
-                    with dcol1:
-                        field("Department", details['department'])
-                        field("Tenure", details['tenure_display'])
-                    with dcol2:
-                        field("Salary", f"₹{details['effective_salary']:,.0f}")
-                        field("Current Project", details['current_project'])
-                    with dcol3:
-                        field("Rating", details['rating'])
-                        field("Status", details['status'])
 
     with right:
         section_title("Project Overview", "folder")
@@ -105,34 +88,63 @@ def render():
                 if i < len(proj_df) - 1:
                     st.markdown(
                         "<hr style='margin:8px 0;border-color:#E5E7EB;'>", unsafe_allow_html=True)
+
+    # --- Employee Details Expander (Columns ke bahar render karein taaki poori width mile aur clash na ho) ---
+    if st.session_state.get("dash_top_performer_select_unique"):
+        selected_name = st.session_state["dash_top_performer_select_unique"]
+        matched_row = top_df[top_df["Name"] == selected_name]
+        if not matched_row.empty:
+            emp_id_val = matched_row["_id"].iloc[0]
+            # Handle both int or string ID safely
+            try:
+                emp_id = int(emp_id_val)
+            except ValueError:
+                emp_id = emp_id_val 
+
+            details = employee_service.get_employee_details(emp_id)
+            if details:
+                with st.expander(f"📌 {details['name']} — {details['role']}", expanded=True):
+                    dcol1, dcol2, dcol3 = st.columns(3)
+                    with dcol1:
+                        field("Department", details.get('department', 'N/A'))
+                        field("Tenure", details.get('tenure_display', 'N/A'))
+                    with dcol2:
+                        field("Salary", f"₹{details.get('effective_salary', 0):,.0f}")
+                        field("Current Project", details.get('current_project', 'N/A'))
+                    with dcol3:
+                        field("Rating", details.get('rating', 'N/A'))
+                        field("Status", details.get('status', 'N/A'))
+
+    st.markdown("---")
+
     # --- Charts Grid ---
     section_title("Workforce Analytics", "bar-chart")
     g1, g2 = st.columns(2)
     with g1:
         fig = workforce_analysis.department_headcount_chart()
         if fig:
-            st.plotly_chart(fig, width='stretch')
+            st.plotly_chart(fig, use_container_width=True)
     with g2:
         fig = salary_analysis.emp_type_distribution_pie()
         if fig:
-            st.plotly_chart(fig, width='stretch')
+            st.plotly_chart(fig, use_container_width=True)
 
     g3, g4 = st.columns(2)
     with g3:
         fig = performance_analysis.avg_performance_by_department_chart()
         if fig:
-            st.plotly_chart(fig, width='stretch')
+            st.plotly_chart(fig, use_container_width=True)
     with g4:
         fig = performance_analysis.experience_distribution_chart()
         if fig:
-            st.plotly_chart(fig, width='stretch')
+            st.plotly_chart(fig, use_container_width=True)
 
     g5, g6 = st.columns(2)
     with g5:
         fig = performance_analysis.role_distribution_chart()
         if fig:
-            st.plotly_chart(fig, width='stretch')
+            st.plotly_chart(fig, use_container_width=True)
     with g6:
         fig = salary_analysis.department_cost_bar_chart()
         if fig:
-            st.plotly_chart(fig, width='stretch')
+            st.plotly_chart(fig, use_container_width=True)
